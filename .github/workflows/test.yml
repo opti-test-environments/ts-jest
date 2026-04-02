@@ -47,8 +47,8 @@ jobs:
 
       - name: Run e2e tests 🧪
         run: |
-          npx jest --maxWorkers=100% -c=jest-e2e-cjs.config.ts --no-cache
-          node --experimental-vm-modules --no-warnings node_modules/jest/bin/jest.js --maxWorkers=100% -c=jest-e2e-esm.config.ts --no-cache
+          npm run test-e2e-cjs
+          npm run test-e2e-esm
 
       - name: Run tests in example projects 🧪
         run: npm run test-examples
