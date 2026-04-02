@@ -14,13 +14,12 @@ permissions: # added using https://github.com/step-security/secure-workflows
   contents: read
 
 jobs:
-  test:
+  unit-tests:
     permissions:
       checks: write
       contents: read
-    name: Run tests on Node v${{ inputs.node-version }} on ${{ inputs.os }}
+    name: Unit tests on Node v${{ inputs.node-version }} on ${{ inputs.os }}
     runs-on: ${{ inputs.os }}
-
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -40,15 +39,64 @@ jobs:
           npm run postbuild
 
       - name: Run tests 🧪
-        run: npm run test
+        run: npx jest --maxWorkers=100% -c=jest.config.ts
         env:
           CI: true
           DISABLE_MOCKED_WARNING: true
 
-      - name: Run e2e tests 🧪
+  e2e-tests:
+    permissions:
+      checks: write
+      contents: read
+    name: E2E tests on Node v${{ inputs.node-version }} on ${{ inputs.os }}
+    runs-on: ${{ inputs.os }}
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 20
+          fetch-tags: false
+
+      - name: Setup workspace ⚙️
+        uses: ./.github/actions/setup-workspace
+        with:
+          os: ${{ inputs.os }}
+          node-version: ${{ inputs.node-version }}
+
+      - name: Build 🔧
         run: |
-          npm run test-e2e-cjs
-          npm run test-e2e-esm
+          npm run build
+          npm run postbuild
+
+      - name: Run e2e CJS tests 🧪
+        run: npx jest --maxWorkers=100% -c=jest-e2e-cjs.config.ts --no-cache
+
+      - name: Run e2e ESM tests 🧪
+        run: node --experimental-vm-modules --no-warnings node_modules/jest/bin/jest.js --maxWorkers=100% -c=jest-e2e-esm.config.ts --no-cache
+
+  example-tests:
+    permissions:
+      checks: write
+      contents: read
+    name: Example project tests on Node v${{ inputs.node-version }} on ${{ inputs.os }}
+    runs-on: ${{ inputs.os }}
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 20
+          fetch-tags: false
+
+      - name: Setup workspace ⚙️
+        uses: ./.github/actions/setup-workspace
+        with:
+          os: ${{ inputs.os }}
+          node-version: ${{ inputs.node-version }}
+
+      - name: Build 🔧
+        run: |
+          npm run build
+          npm run postbuild
 
       - name: Run tests in example projects 🧪
         run: npm run test-examples
