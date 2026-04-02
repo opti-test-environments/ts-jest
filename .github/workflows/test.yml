@@ -40,7 +40,7 @@ jobs:
           npm run postbuild
 
       - name: Run tests 🧪
-        run: npx jest --maxWorkers=100% -c=jest.config.ts
+        run: npm run test -- --maxWorkers=100%
         env:
           CI: true
           DISABLE_MOCKED_WARNING: true
