@@ -40,7 +40,7 @@ jobs:
           npm run postbuild
 
       - name: Run tests 🧪
-        run: npm run test
+        run: npm run test -- --maxWorkers=100%
         env:
           CI: true
           DISABLE_MOCKED_WARNING: true
