@@ -16,7 +16,7 @@ on:
 jobs:
   codeql-scan:
     name: Scan Vulnerabilities with CodeQL (${{ matrix.language }}) 🛡️
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     permissions:
       # required for all workflows
       security-events: write
@@ -34,7 +34,7 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
-          fetch-depth: 20
+          fetch-depth: 1
           fetch-tags: false
 
       - name: Initialize CodeQL ⚙️
