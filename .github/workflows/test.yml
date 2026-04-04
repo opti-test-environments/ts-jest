@@ -14,13 +14,9 @@ permissions: # added using https://github.com/step-security/secure-workflows
   contents: read
 
 jobs:
-  test:
-    permissions:
-      checks: write
-      contents: read
-    name: Run tests on Node v${{ inputs.node-version }} on ${{ inputs.os }}
+  build:
+    name: Build on Node v${{ inputs.node-version }} on ${{ inputs.os }}
     runs-on: ${{ inputs.os }}
-
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -39,16 +35,101 @@ jobs:
           npm run build
           npm run postbuild
 
+      - name: Upload build artifacts 📦
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: build-${{ inputs.os }}-node${{ inputs.node-version }}
+          include-hidden-files: true
+          path: |
+            dist/
+            .ts-jest-digest
+          retention-days: 1
+
+  unit-tests:
+    permissions:
+      checks: write
+      contents: read
+    name: Unit tests on Node v${{ inputs.node-version }} on ${{ inputs.os }}
+    runs-on: ${{ inputs.os }}
+    needs: build
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 20
+          fetch-tags: false
+
+      - name: Setup workspace ⚙️
+        uses: ./.github/actions/setup-workspace
+        with:
+          os: ${{ inputs.os }}
+          node-version: ${{ inputs.node-version }}
+
+      - name: Download build artifacts 📦
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: build-${{ inputs.os }}-node${{ inputs.node-version }}
+
       - name: Run tests 🧪
         run: npm run test
         env:
           CI: true
           DISABLE_MOCKED_WARNING: true
 
+  e2e-tests:
+    permissions:
+      checks: write
+      contents: read
+    name: E2E tests on Node v${{ inputs.node-version }} on ${{ inputs.os }}
+    runs-on: ${{ inputs.os }}
+    needs: build
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 20
+          fetch-tags: false
+
+      - name: Setup workspace ⚙️
+        uses: ./.github/actions/setup-workspace
+        with:
+          os: ${{ inputs.os }}
+          node-version: ${{ inputs.node-version }}
+
+      - name: Download build artifacts 📦
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: build-${{ inputs.os }}-node${{ inputs.node-version }}
+
       - name: Run e2e tests 🧪
         run: |
           npm run test-e2e-cjs
           npm run test-e2e-esm
+
+  example-tests:
+    permissions:
+      checks: write
+      contents: read
+    name: Example tests on Node v${{ inputs.node-version }} on ${{ inputs.os }}
+    runs-on: ${{ inputs.os }}
+    needs: build
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 20
+          fetch-tags: false
+
+      - name: Setup workspace ⚙️
+        uses: ./.github/actions/setup-workspace
+        with:
+          os: ${{ inputs.os }}
+          node-version: ${{ inputs.node-version }}
+
+      - name: Download build artifacts 📦
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: build-${{ inputs.os }}-node${{ inputs.node-version }}
 
       - name: Run tests in example projects 🧪
         run: npm run test-examples
