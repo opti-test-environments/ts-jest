@@ -22,7 +22,7 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
-          fetch-depth: 20
+          fetch-depth: 1
           fetch-tags: false
 
       - name: Setup workspace ⚙️
@@ -30,3 +30,9 @@ jobs:
         with:
           os: ${{ inputs.os }}
           node-version: ${{ inputs.node-version }}
+
+# optiant-llm-review: ### Evaluation result: not approved for PR
+
+At least one requirement below failed; the session routes to LLM review instead of opening a PR.
+
+| | Baseline (default branch) | Candidate (experiment bran (iteration 2)
