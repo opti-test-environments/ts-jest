@@ -40,7 +40,7 @@ jobs:
           npm run postbuild
 
       - name: Run tests 🧪
-        run: npm run test
+        run: npm run test -- --maxWorkers=100%
         env:
           CI: true
           DISABLE_MOCKED_WARNING: true
@@ -52,3 +52,9 @@ jobs:
 
       - name: Run tests in example projects 🧪
         run: npm run test-examples
+
+# optiant-llm-review: ### Evaluation result: not approved for PR
+
+At least one requirement below failed; the session routes to LLM review instead of opening a PR.
+
+| | Baseline (default branch) | Candidate (experiment bran (iteration 2)
