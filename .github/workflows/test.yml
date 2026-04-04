@@ -25,7 +25,7 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
-          fetch-depth: 20
+          fetch-depth: 1
           fetch-tags: false
 
       - name: Setup workspace ⚙️
@@ -40,7 +40,7 @@ jobs:
           npm run postbuild
 
       - name: Run tests 🧪
-        run: npm run test
+        run: npm run test -- --maxWorkers=100%
         env:
           CI: true
           DISABLE_MOCKED_WARNING: true
